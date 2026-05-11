@@ -38,38 +38,33 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 w-full max-w-sm p-8">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 w-full max-w-sm p-6 sm:p-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-700">Sign In</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-700">Sign In</h1>
           <p className="text-sm text-slate-500 mt-1">Household Finance Tracker</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Username</label>
             <input
-              type="text"
-              required
-              autoComplete="username"
+              type="text" required autoComplete="username"
               value={form.username}
               onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-              className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
             <input
-              type="password"
-              required
-              autoComplete="current-password"
+              type="password" required autoComplete="current-password"
               value={form.password}
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-              className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+            type="submit" disabled={loading}
+            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
           >
             {loading ? <Spinner /> : 'Sign In'}
           </button>

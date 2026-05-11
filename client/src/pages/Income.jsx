@@ -27,9 +27,7 @@ export default function Income() {
 
   useEffect(() => { loadEntries(); }, []);
 
-  const hasCurrentMonth = entries.some(
-    e => e.month?.slice(0, 7) === currentMonth.slice(0, 7)
-  );
+  const hasCurrentMonth = entries.some(e => e.month?.slice(0, 7) === currentMonth.slice(0, 7));
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -51,9 +49,10 @@ export default function Income() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-700 mb-6">Income Entry</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-slate-700 mb-5">Income Entry</h1>
 
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-6 max-w-md">
+      {/* Form card */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 mb-5 max-w-md">
         <h2 className="text-base font-semibold text-slate-700 mb-1">{monthLabel}</h2>
         <p className="text-sm text-slate-500 mb-4">Enter your income for this month.</p>
 
@@ -67,19 +66,14 @@ export default function Income() {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Income Amount ($)</label>
             <input
-              type="number"
-              step="0.01"
-              min="0"
-              required
-              placeholder="0.00"
+              type="number" step="0.01" min="0" required placeholder="0.00"
               value={amount}
               onChange={e => setAmount(e.target.value)}
               className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
           <button
-            type="submit"
-            disabled={loading}
+            type="submit" disabled={loading}
             className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? <Spinner /> : 'Submit Income'}
@@ -87,9 +81,10 @@ export default function Income() {
         </form>
       </div>
 
+      {/* History table */}
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-200">
-          <h2 className="text-base font-semibold text-slate-700">Income History</h2>
+        <div className="px-4 sm:px-6 py-4 border-b border-slate-200">
+          <h2 className="text-sm sm:text-base font-semibold text-slate-700">Income History</h2>
         </div>
         {fetching ? (
           <div className="flex items-center justify-center p-12"><Spinner size="lg" /></div>
@@ -99,17 +94,17 @@ export default function Income() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Month</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">Amount</th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Month</th>
+                <th className="px-4 sm:px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {entries.map(e => (
                 <tr key={e.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-3.5 text-slate-700">
+                  <td className="px-4 sm:px-6 py-3.5 text-slate-700">
                     {new Date(e.month).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}
                   </td>
-                  <td className="px-6 py-3.5 text-right font-semibold text-green-600">
+                  <td className="px-4 sm:px-6 py-3.5 text-right font-semibold text-green-600">
                     {formatCurrency(e.amount_cents)}
                   </td>
                 </tr>

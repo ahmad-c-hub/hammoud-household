@@ -48,9 +48,9 @@ router.get('/summary', async (req, res) => {
     res.json({
       totalIncome: parseInt(incomeTotal.rows[0].total),
       totalSpent: parseInt(spendTotal.rows[0].total),
-      incomeByUser: incomeByUser.rows,
-      spentByCategory: byCategory.rows,
-      spentByUser: byUser.rows,
+      incomeByUser: incomeByUser.rows.map(r => ({ ...r, amount: parseInt(r.amount) })),
+      spentByCategory: byCategory.rows.map(r => ({ ...r, amount: parseInt(r.amount) })),
+      spentByUser: byUser.rows.map(r => ({ ...r, amount: parseInt(r.amount) })),
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
