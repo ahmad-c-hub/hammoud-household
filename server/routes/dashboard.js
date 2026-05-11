@@ -16,7 +16,7 @@ router.get('/summary', async (req, res) => {
         [household_id, month]
       ),
       pool.query(
-        `SELECT u.name, ie.amount_cents AS amount
+        `SELECT u.id AS user_id, u.name, ie.amount_cents AS amount
          FROM income_entries ie
          JOIN users u ON u.id = ie.user_id
          WHERE ie.household_id=$1 AND ie.month=$2`,

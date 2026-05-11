@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiRequest } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../utils/currency';
 import toast from 'react-hot-toast';
 import Spinner from '../components/Spinner';
@@ -7,11 +8,12 @@ import Spinner from '../components/Spinner';
 const inputCls = 'w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent';
 
 export default function Spend() {
+  const { user } = useAuth();
   const today = new Date().toISOString().slice(0, 10);
 
   const [form, setForm] = useState({ amount: '', category: '', date: today, note: '' });
   const [loading, setLoading] = useState(false);
-  const [entries, setEntries] = useState([]);
+  const [allEntries, setAllEntries] = useState([]);
   const [categories, setCategories] = useState([]);
   const [fetching, setFetching] = useState(true);
   const [filters, setFilters] = useState({ start: '', end: '', category: '' });
@@ -23,7 +25,7 @@ export default function Spend() {
         apiRequest('/api/spend'),
       ]);
       setCategories(cats);
-      setEntries(spend);
+      setAllEntries(spend);
       setForm(f => ({ ...f, category: f.category || cats[0]?.name || '' }));
     } catch (err) {
       toast.error(err.message);
@@ -53,13 +55,16 @@ export default function Spend() {
     try {
       await apiRequest(`/api/spend/${id}`, { method: 'DELETE' });
       toast.success('Entry deleted');
-      setEntries(prev => prev.filter(e => e.id !== id));
+      setAllEntries(prev => prev.filter(e => e.id !== id));
     } catch (err) {
       toast.error(err.message);
     }
   }
 
-  const filtered = entries.filter(e => {
+  // Only show the current user's entries
+  const myEntries = allEntries.filter(e => String(e.user_id) === String(user.id));
+
+  const filtered = myEntries.filter(e => {
     if (filters.start && e.date < filters.start) return false;
     if (filters.end && e.date > filters.end) return false;
     if (filters.category && e.category !== filters.category) return false;
@@ -78,30 +83,22 @@ export default function Spend() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Amount ($)</label>
-              <input
-                type="number" step="0.01" min="0" required placeholder="0.00"
-                value={form.amount}
-                onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
-                className={inputCls}
-              />
+              <input type="number" step="0.01" min="0" required placeholder="0.00"
+                value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
+                className={inputCls} />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
-              <input
-                type="date" required
-                value={form.date}
+              <input type="date" required value={form.date}
                 onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-                className={inputCls}
-              />
+                className={inputCls} />
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-            <select
-              required value={form.category}
+            <select required value={form.category}
               onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-              className={inputCls}
-            >
+              className={inputCls}>
               {categories.length === 0 && <option value="">Loading...</option>}
               {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
             </select>
@@ -110,17 +107,12 @@ export default function Spend() {
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Note <span className="text-slate-400">(optional)</span>
             </label>
-            <input
-              type="text" placeholder="What was this for?"
-              value={form.note}
+            <input type="text" placeholder="What was this for?" value={form.note}
               onChange={e => setForm(f => ({ ...f, note: e.target.value }))}
-              className={inputCls}
-            />
+              className={inputCls} />
           </div>
-          <button
-            type="submit" disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-          >
+          <button type="submit" disabled={loading}
+            className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             {loading ? <Spinner /> : 'Add Entry'}
           </button>
         </form>
@@ -128,29 +120,21 @@ export default function Spend() {
 
       {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
-        <input
-          type="date" value={filters.start}
+        <input type="date" value={filters.start}
           onChange={e => setFilters(f => ({ ...f, start: e.target.value }))}
-          className="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full"
-        />
-        <input
-          type="date" value={filters.end}
+          className="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full" />
+        <input type="date" value={filters.end}
           onChange={e => setFilters(f => ({ ...f, end: e.target.value }))}
-          className="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full"
-        />
-        <select
-          value={filters.category}
+          className="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full" />
+        <select value={filters.category}
           onChange={e => setFilters(f => ({ ...f, category: e.target.value }))}
-          className="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full"
-        >
+          className="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full">
           <option value="">All Categories</option>
           {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
         </select>
         {hasFilters && (
-          <button
-            onClick={() => setFilters({ start: '', end: '', category: '' })}
-            className="text-sm text-indigo-600 hover:text-indigo-800 underline text-left sm:col-span-3"
-          >
+          <button onClick={() => setFilters({ start: '', end: '', category: '' })}
+            className="text-sm text-indigo-600 hover:text-indigo-800 underline text-left sm:col-span-3">
             Clear filters
           </button>
         )}
@@ -161,8 +145,8 @@ export default function Spend() {
         <div className="px-4 sm:px-6 py-4 border-b border-slate-200">
           <h2 className="text-sm sm:text-base font-semibold text-slate-700">
             My Entries{' '}
-            {filtered.length !== entries.length && (
-              <span className="text-slate-400 font-normal text-sm">({filtered.length} of {entries.length})</span>
+            {filtered.length !== myEntries.length && (
+              <span className="text-slate-400 font-normal text-sm">({filtered.length} of {myEntries.length})</span>
             )}
           </h2>
         </div>
@@ -192,10 +176,8 @@ export default function Spend() {
                     <td className="px-4 sm:px-6 py-3.5 text-right font-semibold text-red-500 whitespace-nowrap">{formatCurrency(e.amount_cents)}</td>
                     <td className="px-4 sm:px-6 py-3.5 text-slate-500 max-w-[160px] truncate hidden sm:table-cell">{e.note || <span className="text-slate-300">—</span>}</td>
                     <td className="px-4 sm:px-6 py-3.5 text-right">
-                      <button
-                        onClick={() => handleDelete(e.id)}
-                        className="text-xs font-medium text-red-400 hover:text-red-600 transition-colors"
-                      >
+                      <button onClick={() => handleDelete(e.id)}
+                        className="text-xs font-medium text-red-400 hover:text-red-600 transition-colors">
                         Delete
                       </button>
                     </td>
