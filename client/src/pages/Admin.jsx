@@ -111,6 +111,7 @@ export default function Admin() {
   const [newCat, setNewCat] = useState('');
   const [catLoading, setCatLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [reminderLoading, setReminderLoading] = useState(false);
 
   async function loadData() {
     try {
@@ -137,6 +138,18 @@ export default function Admin() {
       setUsers(prev => prev.filter(u => u.id !== id));
     } catch (err) {
       toast.error(err.message);
+    }
+  }
+
+  async function handleTriggerReminders() {
+    setReminderLoading(true);
+    try {
+      const data = await apiRequest('/api/admin/reminders/trigger', { method: 'POST' });
+      toast.success(`Reminders sent to ${data.sent} user${data.sent !== 1 ? 's' : ''}`);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setReminderLoading(false);
     }
   }
 
@@ -279,6 +292,21 @@ export default function Admin() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Notifications */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6">
+        <h2 className="text-sm sm:text-base font-semibold text-slate-700 mb-1">Notifications</h2>
+        <p className="text-sm text-slate-500 mb-4">
+          Spending reminders are sent automatically at 9 PM Beirut time to users who haven't logged anything today.
+        </p>
+        <button
+          onClick={handleTriggerReminders}
+          disabled={reminderLoading}
+          className="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+        >
+          {reminderLoading ? <Spinner /> : 'Send Spending Reminder Now'}
+        </button>
       </div>
 
       {modal && (

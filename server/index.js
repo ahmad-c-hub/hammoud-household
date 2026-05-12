@@ -25,6 +25,7 @@ app.use('/api/dashboard', require('./routes/dashboard'));
 
 async function start() {
   await initDB();
+  require('./jobs/dailyReminder');
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 

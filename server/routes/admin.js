@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const pool = require('../db');
 const { auth, adminOnly } = require('../middleware/auth');
+const { sendDailyReminders } = require('../jobs/dailyReminder');
 
 const router = express.Router();
 router.use(auth, adminOnly);
@@ -44,6 +45,15 @@ router.put('/users/:id', async (req, res) => {
     res.json(result.rows[0]);
   } catch (err) {
     if (err.code === '23505') return res.status(400).json({ error: 'Email already in use' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/reminders/trigger', async (req, res) => {
+  try {
+    const sent = await sendDailyReminders();
+    res.json({ sent });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
