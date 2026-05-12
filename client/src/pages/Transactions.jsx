@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { apiRequest } from '../api/client';
 import { formatCurrency } from '../utils/currency';
+import { formatDate, toDateStr } from '../utils/date';
 import toast from 'react-hot-toast';
 import Spinner from '../components/Spinner';
 
@@ -47,17 +48,19 @@ export default function Transactions() {
   function setEnd(v)   { setFilters(f => ({ ...f, end: v,   day: v ? '' : f.day })); }
 
   const filtered = useMemo(() => entries.filter(e => {
+    const d = toDateStr(e.date);
     if (filters.user_id && String(e.user_id) !== String(filters.user_id)) return false;
     if (filters.category && e.category !== filters.category) return false;
-    if (filters.day) return e.date === filters.day;
-    if (filters.start && e.date < filters.start) return false;
-    if (filters.end && e.date > filters.end) return false;
+    if (filters.day) return d === filters.day;
+    if (filters.start && d < filters.start) return false;
+    if (filters.end && d > filters.end) return false;
     return true;
   }), [entries, filters]);
 
   const sorted = useMemo(() => [...filtered].sort((a, b) => {
     let av = a[sort.col] ?? '', bv = b[sort.col] ?? '';
     if (sort.col === 'amount_cents') { av = Number(av); bv = Number(bv); }
+    if (sort.col === 'date') { av = toDateStr(av); bv = toDateStr(bv); }
     if (av < bv) return sort.dir === 'asc' ? -1 : 1;
     if (av > bv) return sort.dir === 'asc' ? 1 : -1;
     return 0;
@@ -71,7 +74,7 @@ export default function Transactions() {
 
   function exportToExcel() {
     const rows = sorted.map(e => ({
-      Date: e.date,
+      Date: toDateStr(e.date),
       Person: e.user_name,
       Category: e.category,
       Amount: (e.amount_cents / 100).toFixed(2),
@@ -175,7 +178,7 @@ export default function Transactions() {
               <tbody className="divide-y divide-slate-100">
                 {sorted.map(e => (
                   <tr key={e.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-4 sm:px-6 py-3.5 text-slate-700 whitespace-nowrap">{e.date}</td>
+                    <td className="px-4 sm:px-6 py-3.5 text-slate-700 whitespace-nowrap">{formatDate(e.date)}</td>
                     <td className="px-4 sm:px-6 py-3.5 text-slate-700 font-medium whitespace-nowrap">{e.user_name}</td>
                     <td className="px-4 sm:px-6 py-3.5">
                       <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium whitespace-nowrap">{e.category}</span>

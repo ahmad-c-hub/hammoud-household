@@ -20,7 +20,7 @@ router.get('/setup-status', async (req, res) => {
 });
 
 router.post('/register-household', async (req, res) => {
-  const { householdName, adminName, username, password } = req.body;
+  const { householdName, adminName, username, email, password } = req.body;
   try {
     const count = await pool.query('SELECT COUNT(*) FROM households');
     if (parseInt(count.rows[0].count) > 0) {
@@ -35,8 +35,8 @@ router.post('/register-household', async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const userResult = await pool.query(
-      'INSERT INTO users (household_id, name, username, password_hash, role, has_income, can_spend) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *',
-      [household.id, adminName, username, passwordHash, 'admin', true, true]
+      'INSERT INTO users (household_id, name, username, email, password_hash, role, has_income, can_spend) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *',
+      [household.id, adminName, username, email || null, passwordHash, 'admin', true, true]
     );
     const user = userResult.rows[0];
 

@@ -9,8 +9,8 @@ function UserModal({ user, onClose, onSave }) {
   const isEdit = !!user;
   const [form, setForm] = useState(
     user
-      ? { name: user.name, has_income: user.has_income, can_spend: user.can_spend, role: user.role }
-      : { name: '', username: '', password: '', role: 'member', has_income: false, can_spend: false }
+      ? { name: user.name, email: user.email || '', has_income: user.has_income, can_spend: user.can_spend, role: user.role }
+      : { name: '', username: '', email: '', password: '', role: 'member', has_income: false, can_spend: false }
   );
   const [loading, setLoading] = useState(false);
 
@@ -61,6 +61,12 @@ function UserModal({ user, onClose, onSave }) {
               </div>
             </>
           )}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <input required type="email" value={form.email} autoComplete="email"
+              onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              className={inputCls} />
+          </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
             <select value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} className={inputCls}>
@@ -179,6 +185,7 @@ export default function Admin() {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Name</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Username</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Email</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Role</th>
                     <th className="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wide">Income</th>
                     <th className="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wide">Spend</th>
@@ -190,6 +197,7 @@ export default function Admin() {
                     <tr key={u.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-3.5 font-medium text-slate-700">{u.name}</td>
                       <td className="px-6 py-3.5 text-slate-500">@{u.username}</td>
+                      <td className="px-6 py-3.5 text-slate-500">{u.email || <span className="text-slate-300">—</span>}</td>
                       <td className="px-6 py-3.5">
                         <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-100 text-slate-600'}`}>
                           {u.role}
@@ -219,6 +227,7 @@ export default function Admin() {
                     <div className="min-w-0">
                       <p className="font-medium text-slate-700 truncate">{u.name}</p>
                       <p className="text-xs text-slate-500 mt-0.5">@{u.username}</p>
+                      {u.email && <p className="text-xs text-slate-400 mt-0.5 truncate">{u.email}</p>}
                     </div>
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0 ${u.role === 'admin' ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-100 text-slate-600'}`}>
                       {u.role}

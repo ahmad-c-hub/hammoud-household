@@ -19,7 +19,7 @@ function Field({ label, type = 'text', placeholder, value, onChange, autoComplet
 }
 
 export default function Setup() {
-  const [form, setForm] = useState({ householdName: '', adminName: '', username: '', password: '' });
+  const [form, setForm] = useState({ householdName: '', adminName: '', username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
   const { login } = useAuth();
@@ -73,6 +73,7 @@ export default function Setup() {
           <Field label="Household Name" placeholder="The Hammoud Family" value={form.householdName} onChange={set('householdName')} />
           <Field label="Your Full Name" placeholder="Ahmad Hammoud" value={form.adminName} onChange={set('adminName')} />
           <Field label="Username" placeholder="ahmad" value={form.username} onChange={set('username')} autoComplete="username" />
+          <Field label="Email" type="email" placeholder="you@example.com" value={form.email} onChange={set('email')} autoComplete="email" />
           <Field label="Password" type="password" placeholder="••••••••" value={form.password} onChange={set('password')} autoComplete="new-password" />
           <button
             type="submit" disabled={loading}

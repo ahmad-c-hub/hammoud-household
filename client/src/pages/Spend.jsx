@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiRequest } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../utils/currency';
+import { formatDate, toDateStr } from '../utils/date';
 import toast from 'react-hot-toast';
 import Spinner from '../components/Spinner';
 
@@ -65,8 +66,9 @@ export default function Spend() {
   const myEntries = allEntries.filter(e => String(e.user_id) === String(user.id));
 
   const filtered = myEntries.filter(e => {
-    if (filters.start && e.date < filters.start) return false;
-    if (filters.end && e.date > filters.end) return false;
+    const d = toDateStr(e.date);
+    if (filters.start && d < filters.start) return false;
+    if (filters.end && d > filters.end) return false;
     if (filters.category && e.category !== filters.category) return false;
     return true;
   });
@@ -169,7 +171,7 @@ export default function Spend() {
               <tbody className="divide-y divide-slate-100">
                 {filtered.map(e => (
                   <tr key={e.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-4 sm:px-6 py-3.5 text-slate-700 whitespace-nowrap">{e.date}</td>
+                    <td className="px-4 sm:px-6 py-3.5 text-slate-700 whitespace-nowrap">{formatDate(e.date)}</td>
                     <td className="px-4 sm:px-6 py-3.5">
                       <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium whitespace-nowrap">{e.category}</span>
                     </td>

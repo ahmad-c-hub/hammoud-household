@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   household_id INT REFERENCES households(id),
   name VARCHAR NOT NULL,
   username VARCHAR UNIQUE NOT NULL,
+  email VARCHAR UNIQUE,
   password_hash VARCHAR NOT NULL,
   role VARCHAR CHECK(role IN ('admin','member')) NOT NULL,
   has_income BOOLEAN DEFAULT false,
